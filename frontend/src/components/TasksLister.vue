@@ -66,6 +66,11 @@
               ></v-text-field>
             </v-col>
           </v-row>
+          <v-row>
+            <v-col cols="6">
+              <ProjectTaskChart :project="project" v-if="this.project" />
+            </v-col>
+          </v-row>
         </v-container>
       </v-card-subtitle>
       <v-card-text>
@@ -138,10 +143,11 @@
 <script>
 import common from "../mixins/common";
 import TaskEditor from "./TaskEditor.vue";
+import ProjectTaskChart from "./ProjectTaskChart.vue";
 
 export default {
   name: "TasksLister",
-  components: { TaskEditor },
+  components: { TaskEditor, ProjectTaskChart },
   props: ["user"],
   mixins: [common],
   methods: {
