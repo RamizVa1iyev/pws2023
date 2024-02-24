@@ -188,6 +188,8 @@ export default {
       .then((res) => res.json())
       .then((data) => {
         this.projects = data;
+      })
+      .then(() => {
         this.task.project = this.project;
       });
     this.getWorkers();

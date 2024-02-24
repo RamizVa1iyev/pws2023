@@ -87,7 +87,7 @@
               @click="checkIfInRole(user, [1]) && click(task)"
             >
               <td>{{ task.name }}</td>
-              <td>{{ task.projectName }}</td>
+              <td>{{ task.project.name }}</td>
               <td>
                 {{ new Date(task.startDate).toLocaleDateString() }}
               </td>
@@ -127,7 +127,7 @@
     <v-dialog v-model="editor" width="50%">
       <TaskEditor
         :id="id"
-        :project="project"
+        :project="id ? clickedTaskProject : project"
         @dataChanged="retrieve"
         @cancel="cancel"
       />
@@ -179,6 +179,7 @@ export default {
     },
     click(row) {
       this.id = row._id;
+      this.clickedTaskProject = row.project._id;
       this.editor = true;
     },
     cancel() {
@@ -197,6 +198,7 @@ export default {
       limit: 10,
       projects: [],
       project: null,
+      clickedTaskProject: null,
     };
   },
   mounted() {

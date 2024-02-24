@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const project = require("./project");
 
 const schema = new mongoose.Schema(
   {
