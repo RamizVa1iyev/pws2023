@@ -68,7 +68,12 @@
           </v-row>
           <v-row>
             <v-col cols="6">
-              <ProjectTaskChart :project="project" v-if="this.project" />
+              <ProjectTaskChart
+                :key="this.project"
+                :forPerson="false"
+                :project="project"
+                v-if="this.project"
+              />
             </v-col>
           </v-row>
         </v-container>
@@ -132,6 +137,7 @@
     <v-dialog v-model="editor" width="50%">
       <TaskEditor
         :id="id"
+        :connection="connection"
         :project="id ? clickedTaskProject : project"
         @dataChanged="retrieve"
         @cancel="cancel"
@@ -205,9 +211,64 @@ export default {
       projects: [],
       project: null,
       clickedTaskProject: null,
+      connection: null,
     };
   },
   mounted() {
+    this.connection = new WebSocket(
+      "ws://" + window.location.host + "/websocket"
+    );
+
+    this.connection.onopen = () => {
+      console.log("Websocket connection established");
+      setTimeout(
+        () =>
+          this.connection.send(
+            JSON.stringify({
+              event: "INIT",
+              session: this.user?.sessionid || null,
+            })
+          ),
+        500
+      );
+    };
+    this.connection.onmessage = (event) => {
+      let data = {};
+      try {
+        data = JSON.parse(event.data);
+        data.timestamp = new Date(data.timestamp);
+      } catch (err) {
+        console.error("Broken WS data", event.data);
+        return;
+      }
+      console.log("WS data arrived");
+      if (data.event === "CHANGE_TASK") {
+        fetch(
+          "/task?search=" +
+            this.search +
+            "&status=" +
+            JSON.stringify(this.status) +
+            "&project=" +
+            (this.project ?? "") +
+            "&skip=" +
+            this.skip +
+            "&limit=" +
+            this.limit,
+          {
+            method: "GET",
+          }
+        )
+          .then((res) => {
+            res
+              .json()
+              .then((data) => {
+                this.tasks = data;
+              })
+              .catch((err) => console.error(err.message));
+          })
+          .catch((err) => console.error(err.message));
+      }
+    };
     fetch("/project?limit=1000", { method: "GET" })
       .then((res) => res.json())
       .then((data) => {

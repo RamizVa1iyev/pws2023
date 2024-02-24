@@ -99,10 +99,17 @@ import ConfirmationDialog from "./ConfirmationDialog.vue";
 
 export default {
   name: "TaskEditor",
-  props: ["id", "project"],
+  props: ["id", "project", "connection"],
   components: { ConfirmationDialog },
   emits: ["cancel", "dataChanged"],
   methods: {
+    sendTaskChanged() {
+      this.connection.send(
+        JSON.stringify({
+          event: "CHANGE_TASK",
+        })
+      );
+    },
     add() {
       fetch("/task", {
         method: "POST",
@@ -113,6 +120,7 @@ export default {
           res
             .json()
             .then(() => {
+              this.sendTaskChanged();
               this.$emit("dataChanged");
             })
             .catch((err) => console.error(err.message));
@@ -129,6 +137,7 @@ export default {
           res
             .json()
             .then(() => {
+              this.sendTaskChanged();
               this.$emit("dataChanged");
             })
             .catch((err) => console.error(err.message));
@@ -147,6 +156,7 @@ export default {
           res
             .json()
             .then(() => {
+              this.sendTaskChanged();
               this.$emit("dataChanged");
             })
             .catch((err) => console.error(err.message));

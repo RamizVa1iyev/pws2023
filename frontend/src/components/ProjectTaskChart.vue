@@ -15,7 +15,7 @@ import { toRaw } from "vue";
 export default {
   name: "ProjectTaskChart",
   components: { ApexChart },
-  props: ["project"],
+  props: ["project", "forPerson", "user"],
   data() {
     return {
       ready: false,
@@ -37,7 +37,8 @@ export default {
     };
   },
   mounted() {
-    fetch("/task?project=" + this.project + "&limit=10", {
+    let filter = this.forPerson ? "worker=" : "project=";
+    fetch("/task?" + filter + this.project + "&limit=10", {
       method: "GET",
     })
       .then((res) => {

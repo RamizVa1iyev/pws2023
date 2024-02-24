@@ -78,6 +78,12 @@ module.exports = {
         });
       }
 
+      if (req.query.worker) {
+        aggregation.unshift({
+          $match: { workers: new mongoose.Types.ObjectId(req.query.worker) },
+        });
+      }
+
       try {
         let status = JSON.parse(req.query.status);
         if (Array.isArray(status)) {
