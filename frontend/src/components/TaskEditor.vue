@@ -12,9 +12,9 @@
           ></v-text-field>
           <v-select
             label="Project"
-            @update:modelValue="getWorkers"
-            v-model="task.project_id"
+            v-model="task.project"
             :rules="[rules.required]"
+            :disabled="true"
             :items="
               projects.map((project) => ({
                 value: project._id,
@@ -45,7 +45,7 @@
             <v-radio :value="3" label="COMPLETED"></v-radio>
           </v-radio-group>
           <v-select
-            v-if="task.project_id && workers.length > 0"
+            v-if="task.project && workers.length > 0"
             v-model="task.workers"
             label="Workers"
             :items="
@@ -99,12 +99,11 @@ import ConfirmationDialog from "./ConfirmationDialog.vue";
 
 export default {
   name: "TaskEditor",
-  props: ["id"],
+  props: ["id", "project"],
   components: { ConfirmationDialog },
   emits: ["cancel", "dataChanged"],
   methods: {
     add() {
-      console.log(this.task);
       fetch("/task", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -159,7 +158,7 @@ export default {
     },
     getWorkers() {
       setTimeout(() => {
-        fetch("/person?project_id=" + this.task.project_id + "&limit=1000", {
+        fetch("/person?project_id=" + this.project + "&limit=1000", {
           method: "GET",
         })
           .then((res) => res.json())
@@ -187,7 +186,11 @@ export default {
   mounted() {
     fetch("/project?limit=1000", { method: "GET" })
       .then((res) => res.json())
-      .then((data) => (this.projects = data));
+      .then((data) => {
+        this.projects = data;
+        this.task.project = this.project;
+      });
+    this.getWorkers();
     if (this.id) {
       fetch("/task?_id=" + this.id, { method: "GET" })
         .then((res) => {

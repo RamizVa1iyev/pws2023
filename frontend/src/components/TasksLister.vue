@@ -13,6 +13,23 @@
                 @input="retrieve"
               ></v-text-field>
             </v-col>
+            <v-col>
+              <v-select
+                label="Project"
+                v-model="project"
+                @update:modelValue="retrieve"
+                :items="
+                  projects.map((project) => ({
+                    value: project._id,
+                    title: project.shortcut,
+                    props: {
+                      subtitle:
+                        project.name + ' ' + project.startDate.slice(0, 10),
+                    },
+                  }))
+                "
+              ></v-select>
+            </v-col>
             <v-col cols="3">
               <v-select
                 v-model="status"
@@ -57,7 +74,7 @@
               <th class="text-left">Name</th>
               <th class="text-left">Project Name</th>
               <th class="text-left">Start date</th>
-              <th class="text-right">End date</th>
+              <th class="text-left">End date</th>
               <th class="text-left">Status</th>
               <th class="text-left">Workers</th>
             </tr>
@@ -70,11 +87,13 @@
             >
               <td>{{ task.name }}</td>
               <td>{{ task.projectName }}</td>
-              <td class="text-right">
+              <td>
                 {{ new Date(task.startDate).toLocaleDateString() }}
               </td>
-              <td class="text-right">
-                {{ new Date(task.endDate).toLocaleDateString() }}
+              <td>
+                {{
+                  task.endDate && new Date(task.endDate).toLocaleDateString()
+                }}
               </td>
               <td>
                 <v-chip>{{
@@ -98,13 +117,19 @@
           variant="elevated"
           color="success"
           @click="add"
+          :disabled="!project"
           v-if="checkIfInRole(user, [1])"
           >Add</v-btn
         >
       </v-card-actions>
     </v-card>
     <v-dialog v-model="editor" width="50%">
-      <TaskEditor :id="id" @dataChanged="retrieve" @cancel="cancel" />
+      <TaskEditor
+        :id="id"
+        :project="project"
+        @dataChanged="retrieve"
+        @cancel="cancel"
+      />
     </v-dialog>
   </div>
 </template>
@@ -127,6 +152,8 @@ export default {
           this.search +
           "&status=" +
           JSON.stringify(this.status) +
+          "&project=" +
+          (this.project ?? "") +
           "&skip=" +
           this.skip +
           "&limit=" +
@@ -167,9 +194,16 @@ export default {
       status: [0, 1, 2, 3],
       skip: 0,
       limit: 10,
+      projects: [],
+      project: null,
     };
   },
   mounted() {
+    fetch("/project?limit=1000", { method: "GET" })
+      .then((res) => res.json())
+      .then((data) => {
+        this.projects = data;
+      });
     this.retrieve();
   },
 };

@@ -5,7 +5,7 @@ const schema = new mongoose.Schema(
     name: { type: String, required: true },
     startDate: {
       type: Date,
-      required: false,
+      required: true,
       transform: (v) => v.toISOString().slice(0, 10),
     },
     endDate: {
@@ -13,8 +13,8 @@ const schema = new mongoose.Schema(
       required: false,
       transform: (v) => v.toISOString().slice(0, 10),
     },
-    project: { type: mongoose.ObjectId, required: false },
-    status: { type: Number, required: false, enum: [0, 1, 2, 3], default: 0 },
+    project: { type: mongoose.ObjectId, required: true },
+    status: { type: Number, required: true, enum: [0, 1, 2, 3], default: 0 },
     workers: { type: [mongoose.ObjectId], required: false, default: [] },
   },
   {
