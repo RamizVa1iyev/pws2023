@@ -1,6 +1,7 @@
 <template>
   <div>
     <ApexChart
+      :key="key"
       v-if="ready"
       :options="chartOptions"
       :series="raw(series)"
@@ -34,6 +35,7 @@ export default {
         },
       },
       series: [{ data: [] }],
+      key: 1,
     };
   },
   mounted() {
@@ -65,8 +67,8 @@ export default {
         console.error("Broken WS data", event.data);
         return;
       }
-      console.log("WS data arrived");
       if (data.event === "CHANGE_TASK") {
+        console.log("WS data arrived");
         fetch("/task?" + filter + this.project + "&limit=10", {
           method: "GET",
         })
@@ -85,12 +87,14 @@ export default {
                   fillColor: task.endDate ? "#00E396" : "#FEB019",
                 }));
                 this.ready = true;
+                this.key++;
               })
               .catch((err) => console.error(err.message));
           })
           .catch((err) => console.error(err.message));
       }
     };
+
     fetch("/task?" + filter + this.project + "&limit=10", {
       method: "GET",
     })
