@@ -42,6 +42,7 @@
               <th class="text-left">Shortcut</th>
               <th class="text-right">Start date</th>
               <th class="text-right">Members</th>
+              <th>#</th>
             </tr>
           </thead>
           <tbody>
@@ -58,6 +59,11 @@
                 {{ new Date(project.startDate).toLocaleDateString() }}
               </td>
               <td class="text-right">{{ project.members }}</td>
+              <td>
+                <v-btn @click="(e) => openChart(e, project._id)"
+                  ><v-icon icon="mdi-chart-timeline"></v-icon
+                ></v-btn>
+              </td>
             </tr>
           </tbody>
         </v-table>
@@ -76,16 +82,20 @@
     <v-dialog v-model="editor" width="50%">
       <ProjectEditor :id="id" @dataChanged="retrieve" @cancel="cancel" />
     </v-dialog>
+    <v-dialog v-model="chart" width="50%">
+      <ProjectTaskChart :project="id" />
+    </v-dialog>
   </div>
 </template>
 
 <script>
 import common from "../mixins/common";
 import ProjectEditor from "./ProjectEditor.vue";
+import ProjectTaskChart from "./ProjectTaskChart.vue";
 
 export default {
   name: "ProjectsLister",
-  components: { ProjectEditor },
+  components: { ProjectEditor, ProjectTaskChart },
   mixins: [common],
   props: ["user"],
   methods: {
@@ -125,6 +135,11 @@ export default {
       this.id = null;
       this.editor = false;
     },
+    openChart(e, projectId) {
+      e.stopPropagation();
+      this.id = projectId;
+      this.chart = true;
+    },
   },
   data() {
     return {
@@ -134,6 +149,7 @@ export default {
       search: "",
       skip: 0,
       limit: 10,
+      chart: false,
     };
   },
   mounted() {

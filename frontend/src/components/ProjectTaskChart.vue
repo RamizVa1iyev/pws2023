@@ -3,7 +3,7 @@
     <ApexChart
       v-if="ready"
       :options="chartOptions"
-      :series="series"
+      :series="raw(series)"
     ></ApexChart>
   </div>
 </template>
@@ -33,7 +33,7 @@ export default {
           type: "datetime",
         },
       },
-      series: [{ name: "Tasks", data: [] }],
+      series: [{ data: [] }],
     };
   },
   mounted() {
@@ -61,8 +61,8 @@ export default {
       .catch((err) => console.error(err.message));
   },
   methods: {
-    row(series) {
-      toRaw(series);
+    raw(series) {
+      return toRaw(series);
     },
   },
 };
