@@ -110,7 +110,7 @@
       <PersonEditor :id="id" @dataChanged="retrieve" @cancel="cancel" />
     </v-dialog>
     <v-dialog v-model="chart" width="50%">
-      <ProjectTaskChart :project="id" :forPerson="true" />
+      <ProjectTaskChart :project="id" :forPerson="true" :user="user" />
     </v-dialog>
   </div>
 </template>

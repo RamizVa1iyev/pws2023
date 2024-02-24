@@ -69,6 +69,7 @@
           <v-row>
             <v-col cols="6">
               <ProjectTaskChart
+                :user="user"
                 :key="this.project"
                 :forPerson="false"
                 :project="project"
