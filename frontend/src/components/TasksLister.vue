@@ -18,6 +18,7 @@
                 label="Project"
                 v-model="project"
                 @update:modelValue="retrieve"
+                :clearable="true"
                 :items="
                   projects.map((project) => ({
                     value: project._id,
