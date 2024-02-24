@@ -104,6 +104,7 @@ mongoose
     // initialize models over the connection
     person.init(connection);
     project.init(connection);
+    task.init(connection);
 
     app.listen(config.port, () => {
       console.log("Backend listening on port", config.port);

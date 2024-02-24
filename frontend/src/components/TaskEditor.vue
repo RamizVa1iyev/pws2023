@@ -7,13 +7,12 @@
           <v-text-field
             variant="solo"
             label="Name"
-            v-model="task.firstName"
+            v-model="task.name"
             :rules="[rules.required]"
           ></v-text-field>
-          <v-combobox
-            clearable
+          <v-select
             label="Project"
-            @change="getWorkers"
+            @update:modelValue="getWorkers"
             v-model="task.project_id"
             :rules="[rules.required]"
             :items="
@@ -25,7 +24,7 @@
                 },
               }))
             "
-          ></v-combobox>
+          ></v-select>
           <v-text-field
             variant="solo"
             type="date"
@@ -40,19 +39,19 @@
             v-model="task.endDate"
           ></v-text-field>
           <v-radio-group label="Status" v-model="task.status" inline>
-            <v-radio :value="0" label="primary"></v-radio>
-            <v-radio :value="1" label="secondary"></v-radio>
-            <v-radio :value="2" label="high"></v-radio>
-            <v-radio :value="3" label="high"></v-radio>
+            <v-radio :value="0" label="PREPARATION"></v-radio>
+            <v-radio :value="1" label="PENDING"></v-radio>
+            <v-radio :value="2" label="IN TESTS"></v-radio>
+            <v-radio :value="3" label="COMPLETED"></v-radio>
           </v-radio-group>
           <v-select
-            v-if="task.project_id"
+            v-if="task.project_id && workers.length > 0"
             v-model="task.workers"
             label="Workers"
             :items="
               workers.map((worker) => ({
                 value: worker._id,
-                title: worker.name,
+                title: worker.firstName + ' ' + worker.lastName,
               }))
             "
             chips
@@ -105,6 +104,7 @@ export default {
   emits: ["cancel", "dataChanged"],
   methods: {
     add() {
+      console.log(this.task);
       fetch("/task", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -158,11 +158,15 @@ export default {
       this.$emit("cancel");
     },
     getWorkers() {
-      fetch("/worker?project_id=" + this.task.project_id + "&&limit=1000", {
-        method: "GET",
-      })
-        .then((res) => res.json())
-        .then((data) => (this.workers = data));
+      setTimeout(() => {
+        fetch("/person?project_id=" + this.task.project_id + "&limit=1000", {
+          method: "GET",
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            this.workers = data;
+          });
+      }, 300);
     },
   },
   data() {
@@ -197,7 +201,7 @@ export default {
         .catch((err) => console.error(err.message));
     } else {
       this.task = {
-        birthDate: new Date().toISOString().slice(0, 10),
+        startDate: new Date().toISOString().slice(0, 10),
         status: 0,
       };
     }

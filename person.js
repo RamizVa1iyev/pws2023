@@ -74,10 +74,11 @@ module.exports = {
         }
       } catch (ex) {}
       try {
-        let projectId = JSON.parse(req.query.project_id);
-        if (projectId.length > 0) {
+        if (req.query.project_id) {
           aggregation.push({
-            $match: { projects: { $elemMatch: projectId } },
+            $match: {
+              projects: new mongoose.Types.ObjectId(req.query.project_id),
+            },
           });
         }
       } catch (ex) {}
